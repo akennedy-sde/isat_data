@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISAT Growth Target Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #024d99 0%, #002742 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #024d99;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #024d99 0%, #002742 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .result-value {
+            color: #024d99;
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="SDE-Logo.png" alt="Logo" style="max-width: 200px; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+        <h1>ISAT Growth Target Calculator</h1>
+        
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject">
+                <option value="">Select a subject</option>
+                <option value="ela">ELA</option>
+                <option value="math">Math</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="grade">Grade</label>
+            <select id="grade">
+                <option value="">Select a grade</option>
+                <option value="3">Grade 3</option>
+                <option value="4">Grade 4</option>
+                <option value="5">Grade 5</option>
+                <option value="6">Grade 6</option>
+                <option value="7">Grade 7</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="score">Your Score</label>
+            <input type="number" id="score" placeholder="Enter your score">
+        </div>
+        
+        <button onclick="calculateTarget()">Get Growth Target</button>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result" id="result">
+            <div class="result-label">Your Growth Target</div>
+            <div class="result-value" id="resultValue"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Embed your data here as a JavaScript array
+        const data = [
+  { Subject: 'ela', Grade: 3, Min_Score: 2001, Max_Score: 2298, Target: 2341},
+{ Subject: 'math', Grade: 3, Min_Score: 2071, Max_Score: 2317, Target: 2353},
+{ Subject: 'ela', Grade: 3, Min_Score: 2299, Max_Score: 2337, Target: 2384},
+{ Subject: 'ela', Grade: 4, Min_Score: 2032, Max_Score: 2340, Target: 2369},
+{ Subject: 'math', Grade: 4, Min_Score: 2090, Max_Score: 2352, Target: 2384},
+{ Subject: 'math', Grade: 3, Min_Score: 2318, Max_Score: 2355, Target: 2387},
+{ Subject: 'ela', Grade: 3, Min_Score: 2338, Max_Score: 2366, Target: 2416},
+{ Subject: 'ela', Grade: 5, Min_Score: 2056, Max_Score: 2368, Target: 2385},
+{ Subject: 'math', Grade: 3, Min_Score: 2356, Max_Score: 2380, Target: 2411},
+{ Subject: 'math', Grade: 6, Min_Score: 2103, Max_Score: 2381, Target: 2392},
+{ Subject: 'ela', Grade: 4, Min_Score: 2341, Max_Score: 2383, Target: 2412},
+{ Subject: 'math', Grade: 5, Min_Score: 2095, Max_Score: 2383, Target: 2382},
+{ Subject: 'ela', Grade: 6, Min_Score: 2079, Max_Score: 2384, Target: 2400},
+{ Subject: 'math', Grade: 4, Min_Score: 2353, Max_Score: 2386, Target: 2425},
+{ Subject: 'ela', Grade: 3, Min_Score: 2367, Max_Score: 2389, Target: 2436},
+{ Subject: 'math', Grade: 7, Min_Score: 2108, Max_Score: 2391, Target: 2411},
+{ Subject: 'ela', Grade: 7, Min_Score: 2082, Max_Score: 2399, Target: 2415},
+{ Subject: 'math', Grade: 3, Min_Score: 2381, Max_Score: 2400, Target: 2439},
+{ Subject: 'math', Grade: 4, Min_Score: 2387, Max_Score: 2410, Target: 2455},
+{ Subject: 'ela', Grade: 3, Min_Score: 2390, Max_Score: 2411, Target: 2455},
+{ Subject: 'ela', Grade: 5, Min_Score: 2369, Max_Score: 2411, Target: 2428},
+{ Subject: 'ela', Grade: 4, Min_Score: 2384, Max_Score: 2415, Target: 2442},
+{ Subject: 'math', Grade: 3, Min_Score: 2401, Max_Score: 2418, Target: 2463},
+{ Subject: 'math', Grade: 5, Min_Score: 2384, Max_Score: 2424, Target: 2437},
+{ Subject: 'ela', Grade: 6, Min_Score: 2385, Max_Score: 2427, Target: 2447},
+{ Subject: 'ela', Grade: 3, Min_Score: 2412, Max_Score: 2431, Target: 2473},
+{ Subject: 'ela', Grade: 4, Min_Score: 2416, Max_Score: 2435, Target: 2463},
+{ Subject: 'math', Grade: 3, Min_Score: 2419, Max_Score: 2435, Target: 2485},
+{ Subject: 'math', Grade: 6, Min_Score: 2382, Max_Score: 2436, Target: 2447},
+{ Subject: 'math', Grade: 4, Min_Score: 2411, Max_Score: 2438, Target: 2480},
+{ Subject: 'ela', Grade: 5, Min_Score: 2412, Max_Score: 2441, Target: 2457},
+{ Subject: 'ela', Grade: 7, Min_Score: 2400, Max_Score: 2446, Target: 2458},
+{ Subject: 'math', Grade: 7, Min_Score: 2392, Max_Score: 2446, Target: 2467},
+{ Subject: 'ela', Grade: 3, Min_Score: 2432, Max_Score: 2449, Target: 2473},
+{ Subject: 'ela', Grade: 4, Min_Score: 2436, Max_Score: 2454, Target: 2483},
+{ Subject: 'math', Grade: 5, Min_Score: 2425, Max_Score: 2454, Target: 2473},
+{ Subject: 'math', Grade: 3, Min_Score: 2436, Max_Score: 2455, Target: 2485},
+{ Subject: 'ela', Grade: 6, Min_Score: 2428, Max_Score: 2456, Target: 2479},
+{ Subject: 'ela', Grade: 5, Min_Score: 2442, Max_Score: 2462, Target: 2484},
+{ Subject: 'math', Grade: 4, Min_Score: 2439, Max_Score: 2462, Target: 2505},
+{ Subject: 'ela', Grade: 3, Min_Score: 2450, Max_Score: 2468, Target: 2492},
+{ Subject: 'ela', Grade: 4, Min_Score: 2455, Max_Score: 2472, Target: 2502},
+{ Subject: 'math', Grade: 6, Min_Score: 2437, Max_Score: 2472, Target: 2484},
+{ Subject: 'math', Grade: 3, Min_Score: 2456, Max_Score: 2476, Target: 2504},
+{ Subject: 'ela', Grade: 7, Min_Score: 2447, Max_Score: 2478, Target: 2487},
+{ Subject: 'math', Grade: 5, Min_Score: 2455, Max_Score: 2479, Target: 2502},
+{ Subject: 'ela', Grade: 5, Min_Score: 2463, Max_Score: 2482, Target: 2509},
+{ Subject: 'ela', Grade: 6, Min_Score: 2457, Max_Score: 2483, Target: 2507},
+{ Subject: 'math', Grade: 7, Min_Score: 2447, Max_Score: 2483, Target: 2484},
+{ Subject: 'math', Grade: 4, Min_Score: 2463, Max_Score: 2484, Target: 2528},
+{ Subject: 'ela', Grade: 3, Min_Score: 2469, Max_Score: 2489, Target: 2512},
+{ Subject: 'ela', Grade: 4, Min_Score: 2473, Max_Score: 2491, Target: 2502},
+{ Subject: 'math', Grade: 3, Min_Score: 2477, Max_Score: 2500, Target: 2525},
+{ Subject: 'ela', Grade: 5, Min_Score: 2483, Max_Score: 2501, Target: 2531},
+{ Subject: 'math', Grade: 6, Min_Score: 2473, Max_Score: 2501, Target: 2514},
+{ Subject: 'math', Grade: 4, Min_Score: 2485, Max_Score: 2503, Target: 2528},
+{ Subject: 'math', Grade: 5, Min_Score: 2480, Max_Score: 2504, Target: 2528},
+{ Subject: 'ela', Grade: 7, Min_Score: 2479, Max_Score: 2506, Target: 2517},
+{ Subject: 'ela', Grade: 6, Min_Score: 2484, Max_Score: 2508, Target: 2531},
+{ Subject: 'ela', Grade: 4, Min_Score: 2492, Max_Score: 2511, Target: 2528},
+{ Subject: 'math', Grade: 7, Min_Score: 2484, Max_Score: 2513, Target: 2531},
+{ Subject: 'math', Grade: 4, Min_Score: 2504, Max_Score: 2524, Target: 2543},
+{ Subject: 'ela', Grade: 5, Min_Score: 2502, Max_Score: 2527, Target: 2531},
+{ Subject: 'math', Grade: 5, Min_Score: 2505, Max_Score: 2527, Target: 2552},
+{ Subject: 'math', Grade: 6, Min_Score: 2502, Max_Score: 2527, Target: 2541},
+{ Subject: 'ela', Grade: 6, Min_Score: 2509, Max_Score: 2530, Target: 2552},
+{ Subject: 'ela', Grade: 7, Min_Score: 2507, Max_Score: 2530, Target: 2543},
+{ Subject: 'ela', Grade: 4, Min_Score: 2512, Max_Score: 2532, Target: 2554},
+{ Subject: 'math', Grade: 7, Min_Score: 2514, Max_Score: 2540, Target: 2558},
+{ Subject: 'math', Grade: 5, Min_Score: 2528, Max_Score: 2542, Target: 2552},
+{ Subject: 'math', Grade: 4, Min_Score: 2525, Max_Score: 2548, Target: 2561},
+{ Subject: 'ela', Grade: 7, Min_Score: 2531, Max_Score: 2551, Target: 2567},
+{ Subject: 'math', Grade: 6, Min_Score: 2528, Max_Score: 2551, Target: 2567},
+{ Subject: 'ela', Grade: 5, Min_Score: 2528, Max_Score: 2553, Target: 2557},
+{ Subject: 'ela', Grade: 6, Min_Score: 2531, Max_Score: 2556, Target: 2552},
+{ Subject: 'math', Grade: 5, Min_Score: 2543, Max_Score: 2560, Target: 2569},
+{ Subject: 'math', Grade: 7, Min_Score: 2541, Max_Score: 2566, Target: 2586},
+{ Subject: 'math', Grade: 6, Min_Score: 2552, Max_Score: 2568, Target: 2567},
+{ Subject: 'math', Grade: 5, Min_Score: 2561, Max_Score: 2578, Target: 2588},
+{ Subject: 'ela', Grade: 7, Min_Score: 2552, Max_Score: 2581, Target: 2567},
+{ Subject: 'ela', Grade: 5, Min_Score: 2554, Max_Score: 2581, Target: 2586},
+{ Subject: 'ela', Grade: 6, Min_Score: 2557, Max_Score: 2585, Target: 2582},
+{ Subject: 'math', Grade: 7, Min_Score: 2567, Max_Score: 2586, Target: 2586},
+{ Subject: 'math', Grade: 6, Min_Score: 2569, Max_Score: 2587, Target: 2587},
+{ Subject: 'math', Grade: 7, Min_Score: 2587, Max_Score: 2608, Target: 2606},
+{ Subject: 'math', Grade: 6, Min_Score: 2588, Max_Score: 2609, Target: 2609},
+{ Subject: 'ela', Grade: 7, Min_Score: 2582, Max_Score: 2612, Target: 2598},
+{ Subject: 'ela', Grade: 6, Min_Score: 2586, Max_Score: 2617, Target: 2613},
+{ Subject: 'math', Grade: 7, Min_Score: 2609, Max_Score: 2634, Target: 2629},
+{ Subject: 'ela', Grade: 7, Min_Score: 2613, Max_Score: 2648, Target: 2631},
+{ Subject: 'ela', Grade: 3, Min_Score: 2490, Max_Score: 2811, Target: 2533},
+{ Subject: 'ela', Grade: 4, Min_Score: 2533, Max_Score: 2867, Target: 2582},
+{ Subject: 'ela', Grade: 5, Min_Score: 2582, Max_Score: 2916, Target: 2618},
+{ Subject: 'ela', Grade: 6, Min_Score: 2618, Max_Score: 2937, Target: 2649},
+{ Subject: 'ela', Grade: 7, Min_Score: 2649, Max_Score: 2989, Target: 2668},
+{ Subject: 'math', Grade: 3, Min_Score: 2501, Max_Score: 2762, Target: 2549},
+{ Subject: 'math', Grade: 4, Min_Score: 2549, Max_Score: 2834, Target: 2579},
+{ Subject: 'math', Grade: 5, Min_Score: 2579, Max_Score: 2891, Target: 2610},
+{ Subject: 'math', Grade: 6, Min_Score: 2610, Max_Score: 2911, Target: 2635},
+{ Subject: 'math', Grade: 7, Min_Score: 2635, Max_Score: 2964, Target: 2653}
+
+];
+        
+        function calculateTarget() {
+            const subject = document.getElementById('subject').value.toLowerCase();
+            const grade = parseInt(document.getElementById('grade').value);
+            const score = parseInt(document.getElementById('score').value);
+            
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+            
+            errorDiv.classList.remove('show');
+            resultDiv.classList.remove('show');
+            
+            if (!subject || !grade || !score) {
+                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            const filtered = data.filter(row => 
+                row.Subject.toLowerCase() === subject && row.Grade === grade
+            );
+            
+            if (filtered.length === 0) {
+                errorDiv.textContent = 'No data found for this subject and grade';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            const matches = filtered.filter(row => score <= row.Max_Score);
+            
+            if (matches.length === 0) {
+                errorDiv.textContent = 'Score is above the available range';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            const target = matches[0].Target;
+            document.getElementById('resultValue').textContent = target;
+            resultDiv.classList.add('show');
+        }
+        
+        // Allow Enter key to trigger calculation
+        document.getElementById('score').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculateTarget();
+            }
+        });
+    </script>
+</body>
+</html>
